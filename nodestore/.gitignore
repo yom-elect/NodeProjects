@@ -1,0 +1,132 @@
+const fs = require('fs')
+const path =  require('path')
+const rootDir =  require('../util/path')
+const Cart = require('./cart')
+const dir =  path.join(rootDir, 'data', 'products.json')
+
+//helper function code reuse
+const getProductFromFile= cb=>{
+    fs.readFile(dir, (err,fileContent)=>{
+        if (err) {
+            cb([]) 
+        }else{
+            cb(JSON.parse(fileContent)) 
+        }
+        
+    })
+}
+module.exports = class Product {
+    constructor (id,title,imageUrl, price,description) {
+        this.id = id;
+        this.title =  title;
+        this.imageUrl = imageUrl;
+        this.price = price;
+        this.description = description;
+    }
+    save() {
+         getProductFromFile(products=>{
+             if(this.id){
+                 const existingProductIndex = products.findIndex(prod => prod.id === this.id)
+                 const updatedProducts = [...products]
+                 updatedProducts[existingProductIndex] = this
+                 fs.writeFile(dir,JSON.stringify(updatedProducts),(err)=>{
+                    console.log(err)
+                          })
+             }
+             else{
+                 this.id  =  Math.random().toString()
+              products.push(this)
+              fs.writeFile(dir,JSON.stringify(products),(err)=>{
+                  console.log(err)
+                      })
+             }
+             
+    })
+    }
+   static delete(id) {
+        getProductFromFile(products=>{
+                const product = products.find(prod=> prod.id === id)
+                const existingproduct = products.filter(product=>product.id !== id)
+                 fs.writeFile(dir,JSON.stringify(existingproduct),(err)=>{
+                   if (!err){
+                      Cart.deleteProduct(id,product.price)
+                   }
+            })
+        })
+    }
+
+        //static method allows to call method on class itself and not instantiated object
+    static fetchAll(cb){
+        getProductFromFile(cb)
+        
+    }
+    static findById(id,cb){
+        getProductFromFile(products=>{
+            const product = products.find(p => p.id === id)
+            cb(product)
+        })
+    }
+}
+// cart model 
+const dir =  path.join(rootDir, 'data', 'chart.json')
+
+module.exports = class Cart{
+    static addProduct(id, productPrice){
+        // fetch the previous cart
+        fs.readFile(dir, (err, fileContent)=>{
+            let cart = {products: [], totalPrice:0}
+            if (!err){
+                cart =  JSON.parse(fileContent)
+            }
+            //Analze the cart => find existing product
+            const existingProductIndex= cart.products.findIndex(prod=>prod.id === id)
+            const existingProduct= cart.products.find(prod=>prod.id === id)
+            let updatedProduct;
+            if (existingProduct){
+                updatedProduct =  {...existingProduct}
+                updatedProduct.qty += 1; 
+                cart.products = [...cart.products]
+                cart.products[existingProductIndex]= updatedProduct;
+            }else{
+                updatedProduct = {id, qty:1}
+                cart.products = [...cart.products, updatedProduct]
+            }
+            cart.totalPrice += +productPrice
+            fs.writeFile(dir , JSON.stringify(cart),err=>{
+                console.log(err)
+            })
+        })
+    }   
+    static deleteProduct(id, price) {
+        fs.readFile(dir, (err, fileContent)=>{
+            if (err){
+                console.log("wrong")
+            }
+            const updatedCart =  {...JSON.parse(fileContent)}
+            const product =  updatedCart.products.find(prod=> prod.id ===id)
+            if (!product){
+                return
+            } 
+            const productQty = product.qty
+            updatedCart.products =  updatedCart.products.filter(prod=> prod.id !== id)
+            updatedCart.totalPrice = updatedCart.totalPrice - product.Price*productQty
+            fs.writeFile(dir , JSON.stringify(updatedCart),err=>{
+                    if(err){
+                        console.log(err)
+                    }
+                })                                                                       
+        })
+    } 
+    static getCart(cb) {
+        fs.readFile(dir, (err, fileContent)=>{
+        const cart = JSON.parse(fileContent)
+        if (err){
+            cb(null)
+        }
+        else{
+            cb(cart)
+        }
+    
+    })
+    }     
+}

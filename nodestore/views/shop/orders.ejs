@@ -1,0 +1,20 @@
+<%-include('../templates/headers')%>
+    <%if (orders.length <= 0) {%>
+        <h1>No order yet</h1>
+    <%} else {%>
+        <ul>
+            <%orders.forEach(order=>{%>
+                <li>
+                    <h1>#<%= order._id%></h1>
+                    <ul>
+                        <%order.products.forEach(prod => {%>
+                            <li><%= prod.product.title%> (<%=prod.quantity%>) </li>
+                        <%})%>
+                    </ul>
+                </li>
+                <a href="/orders/<%= order._id%>">Invoice</a>
+           <%}) %>
+            
+        </ul>
+    <%}%>
+<%- include('../templates/footer')%>

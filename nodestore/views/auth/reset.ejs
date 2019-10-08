@@ -1,0 +1,17 @@
+<%-include('../templates/headers')%>
+    <main>
+    <% if (errorMessage){%>
+    <div class="user-message user-message--error">
+        <%= errorMessage %>
+    </div>  <%}%>
+        <form class="product-form" action="/reset" method="POST">
+            <div class="form-control">
+                <label for="title">Email</label>
+                <input type="email" name="email" id="email" value='' placeholder="Enter Email" required>
+            </div>
+             <input type='hidden' name="_csrf" value="<%=csrfToken%>">
+            <button class="btn" type="submit">Reset Password</button>
+           
+      </form>
+    </main>
+    <%- include('../templates/footer')%>

@@ -1,0 +1,31 @@
+<%-include('../templates/headers')%>
+    <% if (cartProducts.length > 0) {%>
+        <ul class="cart__item-list">
+          <% cartProducts.forEach(cproduct => {%>
+                <li class="cart__item">
+                <p><strong><%= cproduct.productId.title%> <br><br><span>Quantity:</span><%=cproduct.quantity%></strong> </p>
+                <form action="/cart-delete-item" method="Post">
+                  <input
+                    type="hidden"
+                     value ="<%= cproduct.productId._id%>" name="productId"
+                    />
+                    <input type='hidden' name="_csrf" value="<%=csrfToken%>">
+                    <button  class="btn btn-danger" type ="submit" 
+                    >Delete</button>
+                </form>
+                </li>
+        <%  }); %>
+        </ul>
+        <hr>
+        <div class="centered">
+         <!-- <form action="/checked-orders" method="POST">
+          <input type='hidden' name="_csrf" value="<%=csrfToken%>">
+            <button  class="btn" type="submit" >Order Now!</button>
+          </form>
+        </div> -->
+        <a class="btn" href="/checkout">Order Now!</a>
+        
+   <% }else {%>
+        <h1>No products keep shoping</h1>
+    <%}%>
+  <%- include('../templates/footer')%>

@@ -1,0 +1,29 @@
+<%-include('../templates/headers')%>
+    <main>
+    <% if (errorMessage){%>
+    <div class="user-message user-message--error">
+        <%= errorMessage %>
+    </div>  <%}%>
+        <form class="product-form" action="/login" method="POST">
+            <div class="form-control">
+                <label for="title">Email</label>
+                <input 
+                 class="<%= validationErrors.find(e => e.param === 'email' ) ?'invalid':'' %>"
+                type="email" name="email" id="email" value='<%=oldInput.email%>' placeholder="Enter Email" required>
+            </div>
+             <div class="form-control">
+                <label for="password">Password</label>
+                <input 
+                 class="<%= validationErrors.find(e => e.param === 'password' ) ?'invalid':'' %>"
+                type="password" name="password" id="password" value='<%=oldInput.password%>' required>
+            </div>
+             <input type='hidden' name="_csrf" value="<%=csrfToken%>">
+            <button class="btn" type="submit">Login</button>
+           
+      </form>
+      <div class='centered'>
+          <a href="/reset">Reset Password</a>
+      </div>
+      
+    </main>
+    <%- include('../templates/footer')%>

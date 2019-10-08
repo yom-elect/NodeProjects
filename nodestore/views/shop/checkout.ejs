@@ -1,0 +1,31 @@
+<%-include('../templates/headers')%>
+    <ul class="cart__item-list">
+          <% cartProducts.forEach(cproduct => {%>
+                <li class="cart__item">
+                <h1><strong><%= cproduct.productId.title%></strong></h1> 
+                <br>
+                <h2>Quantity:<%=cproduct.quantity%></h2>
+                
+                </li>
+        <%  }); %>
+        </ul>
+        <div class="centered">
+            <h2>Total: $ <%= totalSum%></h2>
+        </div>
+    <div class="centered" >
+        <form action="/checked-orders" method="POST">
+         <input type='hidden' name="_csrf" value="<%=csrfToken%>">
+  <script
+    src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+    data-key="pk_test_vwhO35gk9OrtDk0Cu1hkvslS00hfxCKzgT"
+    data-amount="<%= totalSum * 100%>"
+    data-name="Your Order"
+    data-description="All the items you ordered"
+    data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+    data-locale="auto">
+  </script>
+</form>
+    </div>
+    
+
+  <%- include('../templates/footer')%>
